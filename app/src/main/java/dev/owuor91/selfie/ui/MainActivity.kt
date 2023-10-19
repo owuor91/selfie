@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     val urlTask = uploadTask.continueWithTask { task ->
       if (!task.isSuccessful) {
         task.exception?.let {
-          throw it
+          Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
         }
       }
       videosRef.downloadUrl
