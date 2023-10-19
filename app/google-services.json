@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "912125844769",
+    "project_id": "selfie-22d6e",
+    "storage_bucket": "selfie-22d6e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:912125844769:android:191216a592e8b5df8c3260",
+        "android_client_info": {
+          "package_name": "dev.owuor91.selfie"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmUhnoVlC_J284SbCNK9kJfDyWwypSU5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

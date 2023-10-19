@@ -22,6 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import dev.owuor91.selfie.BuildConfig
 import dev.owuor91.selfie.databinding.ActivityMainBinding
 import dev.owuor91.selfie.viewmodel.SelfieViewModel
@@ -30,30 +32,55 @@ import java.io.FileOutputStream
 import java.io.InputStream
 
 class MainActivity : AppCompatActivity() {
-  val selfieViewModel: SelfieViewModel by viewModels()
-  lateinit var binding: ActivityMainBinding
-  lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
   
+  lateinit var binding: ActivityMainBinding
+  val storage = Firebase.storage
+  lateinit var pickVideo: ActivityResultLauncher<PickVisualMediaRequest>
   
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
-    pickMedia = registerForActivityResult(PickVisualMedia()){uri->
-      if(uri != null){
-        selfieViewModel.postSelfie(uri, "Watagwan")
-      }
+    
+    
+    pickVideo = registerForActivityResult(PickVisualMedia()){uri->
+      uploadVideoToFirebase(uri!!)
     }
   }
   
   override fun onResume() {
     super.onResume()
-    binding.tvHello.setOnClickListener {
-      val mimeType = "image/jpeg"
-      pickMedia.launch(PickVisualMediaRequest(SingleMimeType(mimeType)))
+    
+    binding.btnVidUpload.setOnClickListener {
+      val mimeType = "video/*"
+      pickVideo.launch(PickVisualMediaRequest(SingleMimeType(mimeType)))
     }
   }
   
+  
+  fun uploadVideoToFirebase(uri: Uri){
+    val storageRef = storage.reference
+    val videosRef = storageRef.child("videos")
+    val newVideoRef = videosRef.child(uri.lastPathSegment!!)
+    val uploadTask = newVideoRef.putFile(uri)
+  
+    val urlTask = uploadTask.continueWithTask { task ->
+      if (!task.isSuccessful) {
+        task.exception?.let {
+          throw it
+        }
+      }
+      videosRef.downloadUrl
+    }.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        val downloadUri = task.result
+        Toast.makeText(this, downloadUri.toString(), Toast.LENGTH_LONG).show()
+      } else {
+        Toast.makeText(this, task.exception.toString(), Toast.LENGTH_LONG).show()
+      }
+    }
+    
+  }
   
   
 }
